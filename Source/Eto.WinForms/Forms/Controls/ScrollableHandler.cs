@@ -222,6 +222,12 @@ namespace Eto.WinForms.Forms.Controls
 						Callback.OnScroll(Widget, new ScrollEventArgs(ScrollPosition));
 					};
 					break;
+				case Scrollable.MouseWheelEvent:
+					Control.MouseWheel += (s, e) =>
+					{
+						Callback.OnMouseWheel(Widget, e.ToEto(Control));
+					};
+					break;
 				default:
 					base.AttachEvent(id);
 					break;
