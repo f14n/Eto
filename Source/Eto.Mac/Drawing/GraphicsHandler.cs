@@ -517,6 +517,38 @@ namespace Eto.iOS.Drawing
 			EndDrawing();
 		}
 
+        public void DrawText(NSMutableAttributedString attrString, float x, float y)
+        {
+            StartDrawing();
+            FontExtensions.DrawString(attrString, new PointF(x, y));
+            EndDrawing();
+        }
+
+        public void DrawText(IEnumerable<Tuple<NSMutableAttributedString, float, float>> textItems)
+        {
+            StartDrawing();
+
+            foreach (var textItem in textItems)
+            {
+                FontExtensions.DrawString(textItem.Item1, new PointF(textItem.Item2, textItem.Item3));
+            }
+
+            EndDrawing();
+        }
+
+        public SizeF? DrawAndMeasureText(NSMutableAttributedString attrString, float x, float y)
+        {
+            if (attrString == null)
+                return null;
+
+            StartDrawing();
+            FontExtensions.DrawString(attrString, new PointF(x, y));
+            var size = FontExtensions.MeasureString(attrString);
+            EndDrawing();
+
+            return size;
+        }
+
 		public SizeF MeasureString(Font font, string text)
 		{
 			StartDrawing();

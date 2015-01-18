@@ -30,7 +30,21 @@ namespace Eto.WinForms.Forms.Controls
 				return e.Handled;
 			}
 
-			protected override void OnCreateControl()
+            protected override swf.CreateParams CreateParams
+            {
+                get
+                {
+                    swf.CreateParams cp = base.CreateParams;
+                    cp.ExStyle |= 0x00000020; // WS_EX_TRANSPARENT
+                    return cp;
+                }
+            }
+
+            protected override void OnPaintBackground(swf.PaintEventArgs e)
+            {
+            }
+
+            protected override void OnCreateControl()
 			{
 				base.OnCreateControl();
 				AutoSize = false;
