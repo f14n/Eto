@@ -45,6 +45,12 @@ namespace Eto.Direct2D.Drawing
 			}
 		}
 
+        public void SetFontWeight(sw.FontWeight fontWeight)
+        {
+            var familyHandler = (FontFamilyHandler)family.Handler;
+            Control = familyHandler.Control.GetFirstMatchingFont(fontWeight, sw.FontStretch.Normal, sw.FontStyle.Normal);
+        }
+        
 		public void Create(FontFamily family, float size, FontStyle style, FontDecoration decoration)
 		{
 			this.family = family;

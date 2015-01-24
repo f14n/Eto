@@ -15,7 +15,7 @@ namespace Eto.WinForms.Forms
 			this.Control = screen;
 			var form = new swf.Form ();
 			var graphics = form.CreateGraphics ();
-			scale = graphics.DpiY / 72f;
+			scale = graphics.DpiY / 96f;
 		}
 
 		public float RealScale

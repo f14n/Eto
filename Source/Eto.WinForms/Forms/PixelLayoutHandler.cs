@@ -9,7 +9,7 @@ namespace Eto.WinForms.Forms
 	{
 		public PixelLayoutHandler()
 		{
-			Control = new swf.Panel
+			Control = new TransparentPanel
 			{
 				Size = sd.Size.Empty,
 				MinimumSize = sd.Size.Empty,

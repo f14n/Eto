@@ -28,6 +28,20 @@ namespace Eto.WinForms.Forms.Controls
 				this.SetStyle (swf.ControlStyles.ResizeRedraw, true);
 				this.SetStyle (swf.ControlStyles.SupportsTransparentBackColor, true);
 			}
+            
+            const int WM_NCHITTEST = 0x0084;
+            const int HTTRANSPARENT = -1;
+
+            protected override void WndProc(ref swf.Message m)
+            {
+                if (!Handler.IsHitTestVisible && m.Msg == WM_NCHITTEST)
+                {
+                    m.Result = (IntPtr)HTTRANSPARENT;
+                    return;
+                }
+
+                base.WndProc(ref m);
+            }
 
 			public new void SetStyle(swf.ControlStyles flag, bool value)
 			{
@@ -142,5 +156,7 @@ namespace Eto.WinForms.Forms.Controls
 		{
 			Callback.OnPaint(Widget, e.ToEto());
 		}
-	}
+
+        public bool IsHitTestVisible { get; set; } = true;
+    }
 }

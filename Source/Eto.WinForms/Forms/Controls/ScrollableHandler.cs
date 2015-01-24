@@ -30,14 +30,18 @@ namespace Eto.WinForms.Forms.Controls
 				return e.Handled;
 			}
 
-            protected override swf.CreateParams CreateParams
+            const int WM_NCHITTEST = 0x0084;
+            const int HTTRANSPARENT = -1;
+
+            protected override void WndProc(ref swf.Message m)
             {
-                get
+                if (!Handler.IsHitTestVisible && m.Msg == WM_NCHITTEST)
                 {
-                    swf.CreateParams cp = base.CreateParams;
-                    cp.ExStyle |= 0x00000020; // WS_EX_TRANSPARENT
-                    return cp;
+                    m.Result = (IntPtr)HTTRANSPARENT;
+                    return;
                 }
+
+                base.WndProc(ref m);
             }
 
             protected override void OnPaintBackground(swf.PaintEventArgs e)
@@ -304,5 +308,7 @@ namespace Eto.WinForms.Forms.Controls
 		public float MaximumZoom { get { return 1f; } set { } }
 
 		public float Zoom { get { return 1f; } set { } }
-	}
+        
+        public bool IsHitTestVisible { get; set; } = true;
+    }
 }

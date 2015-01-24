@@ -16,7 +16,25 @@ namespace Eto.WinForms.Forms
 		swf.IWin32Window Win32Window { get; }
 	}
 
-	public abstract class WindowHandler<TControl, TWidget, TCallback> : WindowsPanel<TControl, TWidget, TCallback>, Window.IHandler, IWindowHandler
+    public class TransparentPanel : swf.Panel
+    {
+        const int WM_NCHITTEST = 0x0084;
+        const int HTTRANSPARENT = -1;
+
+        protected override void WndProc(ref swf.Message m)
+        {
+            switch (m.Msg)
+            {
+                case WM_NCHITTEST:
+                    m.Result = (IntPtr)HTTRANSPARENT;
+                    return;
+            }
+
+            base.WndProc(ref m);
+        }
+    }
+
+    public abstract class WindowHandler<TControl, TWidget, TCallback> : WindowsPanel<TControl, TWidget, TCallback>, Window.IHandler, IWindowHandler
 		where TControl : swf.Form
 		where TWidget : Window
 		where TCallback : Window.ICallback
@@ -78,13 +96,13 @@ namespace Eto.WinForms.Forms
 			return false;
 		}
 
-		protected override void Initialize()
+        protected override void Initialize()
 		{
 			Control.KeyPreview = !ApplicationHandler.BubbleKeyEvents;
 			Control.FormBorderStyle = DefaultWindowStyle;
 			resizable = Control.FormBorderStyle.IsResizable();
-			content = new swf.Panel
-			{
+			content = new TransparentPanel
+            {
 				AutoSize = true,
 				AutoSizeMode = swf.AutoSizeMode.GrowAndShrink,
 				Dock = swf.DockStyle.Fill
