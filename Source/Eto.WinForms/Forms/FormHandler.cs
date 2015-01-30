@@ -22,6 +22,10 @@ namespace Eto.WinForms.Forms
 		{
             bool hideFromAltTab;
 
+            public EtoForm()
+            {
+            }
+
 			public bool HideFromAltTab
 			{
 				get { return hideFromAltTab; }
@@ -61,10 +65,20 @@ namespace Eto.WinForms.Forms
                     
 					if (hideFromAltTab)
 						createParams.ExStyle |= (int)Win32.WS_EX.TOOLWINDOW;
-                    
-					return createParams;
+
+                    if (createParamsHack)
+                        createParams.Style &= ~(int)(Win32.WS.BORDER | Win32.WS.CAPTION | Win32.WS.DLGFRAME | Win32.WS.THICKFRAME);
+
+                    return createParams;
 				}
 			}
+
+            protected override void SetClientSizeCore(int x, int y)
+            {
+                createParamsHack = true;
+                base.SetClientSizeCore(x, y);
+                createParamsHack = false;
+            }
 
             const int WM_NCCALCSIZE = 0x0083;
             const int WM_SYSCOMMAND = 0x0112;
@@ -72,6 +86,7 @@ namespace Eto.WinForms.Forms
             const int WM_SIZE = 0x0005;
             const int WM_NCHITTEST = 0x0084;
             const int WM_GETMINMAXINFO = 0x0024;
+            const int WM_WINDOWPOSCHANGED = 0x0047;
             // --- might not use
             const int WM_PAINT = 0;
             const int WM_ERASEBKGND = 0;
@@ -103,10 +118,17 @@ namespace Eto.WinForms.Forms
             const int HTTRANSPARENT = -1;
             const int HTVSCROLL = 7;
 
+            private bool createParamsHack = false;
+            
             protected override void WndProc(ref swf.Message m)
             {
                 switch (m.Msg)
                 {
+                    case WM_WINDOWPOSCHANGED:
+                        createParamsHack = true;
+                        base.WndProc(ref m);
+                        createParamsHack = false;
+                        return;
                     case WM_NCCALCSIZE:
                         m.Result = IntPtr.Zero;
                         return;

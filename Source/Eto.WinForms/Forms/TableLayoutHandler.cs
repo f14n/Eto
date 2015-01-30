@@ -40,10 +40,28 @@ namespace Eto.WinForms.Forms
 			return base.SetMinimumSize(size);
 		}
 
+        public class TransparentTableLayoutPanel : swf.TableLayoutPanel
+        {
+            const int WM_NCHITTEST = 0x0084;
+            const int HTTRANSPARENT = -1;
+
+            protected override void WndProc(ref swf.Message m)
+            {
+                switch (m.Msg)
+                {
+                    case WM_NCHITTEST:
+                        m.Result = (IntPtr)HTTRANSPARENT;
+                        return;
+                }
+
+                base.WndProc(ref m);
+            }
+        }
+
 		public TableLayoutHandler()
 		{
-			Control = new swf.TableLayoutPanel
-			{
+			Control = new TransparentTableLayoutPanel
+            {
 				Margin = swf.Padding.Empty,
 				Dock = swf.DockStyle.Fill,
 				Size = sd.Size.Empty,

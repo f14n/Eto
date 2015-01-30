@@ -54,12 +54,24 @@ namespace Eto.Mac.Forms
 			Control = controller.Window;
 		}
 
-		public FormHandler()
-		{
-			Control = new MyWindow(new CGRect(0, 0, 200, 200), 
-			                       NSWindowStyle.Resizable | NSWindowStyle.Closable | NSWindowStyle.Miniaturizable | NSWindowStyle.Titled, 
-			                       NSBackingStore.Buffered, false);
-			ConfigureWindow();
+        public FormHandler(bool isBorderless)
+            : this(NSWindowStyle.Borderless)
+        {
+            if (!isBorderless)
+            {
+                throw new Exception("If you want a bordered window, call constructor with no arguments.");
+            }
+        }
+
+        public FormHandler(NSWindowStyle style)
+        {
+            Control = new MyWindow(new CGRect(0, 0, 200, 200), style, NSBackingStore.Buffered, false);
+            ConfigureWindow();
+        }
+
+        public FormHandler()
+            : this(NSWindowStyle.Resizable | NSWindowStyle.Closable | NSWindowStyle.Miniaturizable | NSWindowStyle.Titled)
+		{   
 		}
 
 		public void Show()
