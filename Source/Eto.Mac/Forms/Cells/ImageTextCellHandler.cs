@@ -97,6 +97,7 @@ namespace Eto.Mac.Forms.Cells
 		public override void SetForegroundColor(NSCell cell, Color color)
 		{
 			var c = (EtoCell)cell;
+			c.Enabled = true;
 			c.TextColor = color.ToNSUI();
 		}
 
