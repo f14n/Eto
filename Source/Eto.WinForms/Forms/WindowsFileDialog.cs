@@ -5,12 +5,13 @@ using sd = System.Drawing;
 using swf = System.Windows.Forms;
 using Eto.Forms;
 using System.Collections.Generic;
+using Microsoft.WindowsAPICodePack.Dialogs;
 
 namespace Eto.WinForms.Forms
 {
 	public abstract class WindowsFileDialog<TControl, TWidget> : WidgetHandler<TControl, TWidget>, FileDialog.IHandler
-		where TControl : swf.FileDialog
-		where TWidget : FileDialog
+		where TControl : CommonFileDialog
+        where TWidget : FileDialog
 	{
 		public string FileName
 		{
@@ -20,7 +21,8 @@ namespace Eto.WinForms.Forms
 				var dir = Path.GetDirectoryName(value);
 				if (!string.IsNullOrEmpty(dir))
 					Control.InitialDirectory = dir;
-				Control.FileName = Path.GetFileName(value);
+                
+				Control.DefaultFileName = Path.GetFileName(value);
 			}
 		}
 
@@ -52,7 +54,11 @@ namespace Eto.WinForms.Forms
 									   select "*" + ex.Replace(";", " ")
 								   )
 							   );
-			Control.Filter = string.Join("|", filterValues);
+
+            foreach (var f in Widget.Filters)
+            {
+                Control.Filters.Add(new CommonFileDialogFilter(f.Name, string.Join(";", f.Extensions)));
+            }
 		}
 
 		public FileDialogFilter CurrentFilter
@@ -70,14 +76,14 @@ namespace Eto.WinForms.Forms
 
 		public int CurrentFilterIndex
 		{
-			get { return (Control.FilterIndex > 0) ? Control.FilterIndex - 1 : 0; }
-			set { Control.FilterIndex = value + 1; }
+			get { return (Control.SelectedFileTypeIndex > 0) ? Control.SelectedFileTypeIndex - 1 : 0; }
+			set { /*no op*/ }
 		}
 
 		public bool CheckFileExists
 		{
-			get { return Control.CheckFileExists; }
-			set { Control.CheckFileExists = value; }
+			get { return Control.EnsureFileExists; }
+			set { Control.EnsureFileExists = value; }
 		}
 
 		public string Title
@@ -90,12 +96,18 @@ namespace Eto.WinForms.Forms
 		{
 			SetFilters();
 
-			swf.DialogResult dr;
+			CommonFileDialogResult dr;
 			if (parent != null)
-				dr = Control.ShowDialog((swf.Control)parent.ControlObject);
-			else
+				dr = Control.ShowDialog(((swf.Control)parent.ControlObject).Handle);
+            else
 				dr = Control.ShowDialog();
-			return dr.ToEto();
+
+            if (dr == CommonFileDialogResult.Ok)
+                return DialogResult.Ok;
+            else if (dr == CommonFileDialogResult.Cancel)
+                return DialogResult.Cancel;
+            else
+                return DialogResult.None;
 		}
 	}
 }
