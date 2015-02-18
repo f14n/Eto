@@ -19,6 +19,7 @@ namespace Eto.WinForms.Forms
             Control.Title = "Open Folder";
             Control.RestoreDirectory = true;
             Control.ShowPlacesList = true;
+            Control.IsFolderPicker = true;
         }
 
 		public DialogResult ShowDialog (Window parent)
@@ -48,10 +49,10 @@ namespace Eto.WinForms.Forms
 
 		public string Directory {
 			get {
-				return Control.InitialDirectory;
+				return Control.FileName;
 			}
 			set {
-				Control.InitialDirectory = value;
+				Control.DefaultFileName = value;
 			}
 		}
 }
