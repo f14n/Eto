@@ -5,6 +5,7 @@ using Eto.Drawing;
 using sd = System.Drawing;
 using System.Collections;
 using System.Linq;
+
 #if XAMMAC2
 using AppKit;
 using Foundation;
@@ -132,7 +133,6 @@ namespace Eto.Mac.Forms.Controls
 				var colHandler = Handler.GetColumn(tableColumn);
 				var item = Handler.GetItem((int)row);
 				Handler.OnCellFormatting(colHandler.Widget, item, (int)row, cell as NSCell);
-
 			}
 
 			public override void ColumnDidResize(NSNotification notification)
@@ -148,12 +148,6 @@ namespace Eto.Mac.Forms.Controls
 					}
 				}
 			}
-		}
-
-		public bool ShowCellBorders
-		{
-			get { return Control.IntercellSpacing.Width > 0 || Control.IntercellSpacing.Height > 0; }
-			set { Control.IntercellSpacing = value ? new CGSize(1, 1) : CGSize.Empty; } 
 		}
 
 		public override void AttachEvent(string id)

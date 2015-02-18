@@ -176,8 +176,6 @@ namespace Eto.Mac.Forms
 			set
 			{
 				base.MinimumSize = value;
-				// TODO: Mac64
-				#if !Mac64
 				if (value != Size.Empty)
 				{
 					Control.WillResize = (sender, frameSize) =>
@@ -191,7 +189,6 @@ namespace Eto.Mac.Forms
 				}
 				else
 					Control.WillResize = null;
-				#endif
 			}
 		}
 
@@ -457,12 +454,18 @@ namespace Eto.Mac.Forms
 			if (control != null)
 			{
 				var childHandler = control.WeakHandler.Target as IMacViewHandler;
-				if (childHandler != null && childHandler.IsEventHandled(Eto.Forms.Control.KeyDownEvent))
+				if (childHandler != null)
 				{
-					if (handler.fieldEditor == null)
-						handler.fieldEditor = new CustomFieldEditor();
-					handler.fieldEditor.Widget = childHandler.Widget;
-					return handler.fieldEditor;
+					var fieldEditor = childHandler.CustomFieldEditor;
+					if (fieldEditor != null)
+						return fieldEditor;
+					if (childHandler.IsEventHandled(Eto.Forms.Control.KeyDownEvent))
+					{
+						if (handler.fieldEditor == null)
+							handler.fieldEditor = new CustomFieldEditor();
+						handler.fieldEditor.Widget = childHandler.Widget;
+						return handler.fieldEditor;
+					}
 				}
 			}
 			return null;

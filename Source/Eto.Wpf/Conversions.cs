@@ -359,6 +359,11 @@ namespace Eto.Wpf
 			return decoration;
 		}
 
+		public static Bitmap ToEto(this swmi.BitmapSource bitmap)
+		{
+			return new Bitmap(new BitmapHandler(bitmap));
+		}
+
 		public static swmi.BitmapSource ToWpf(this Image image, int? size = null)
 		{
 			if (image == null)
@@ -667,6 +672,20 @@ namespace Eto.Wpf
 				control.ApplyPropertyValue(swd.Inline.TextDecorationsProperty, new sw.TextDecorationCollection());
 			}
 			return font;
+		}
+
+		public static FontFamily SetEtoFamily(this swd.TextRange control, FontFamily fontFamily)
+		{
+			if (control == null) return fontFamily;
+			if (fontFamily != null)
+			{
+				((FontFamilyHandler)fontFamily.Handler).Apply(control);
+			}
+			else
+			{
+				control.ApplyPropertyValue(swd.TextElement.FontFamilyProperty, swc.Control.FontFamilyProperty.DefaultMetadata.DefaultValue);
+			}
+			return fontFamily;
 		}
 
 		public static Font SetEtoFont(this swc.TextBlock control, Font font, Action<sw.TextDecorationCollection> setDecorations = null)
