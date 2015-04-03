@@ -26,6 +26,19 @@ namespace Eto.WinForms.Forms
             {
             }
 
+            public new sd.Rectangle MaximizedBounds
+            {
+                get
+                {
+                    return base.MaximizedBounds;
+                }
+
+                set
+                {
+                    base.MaximizedBounds = value;
+                }
+            }
+
 			public bool HideFromAltTab
 			{
 				get { return hideFromAltTab; }
@@ -136,6 +149,15 @@ namespace Eto.WinForms.Forms
                         var borderWidth = 8;
                         var point = new sd.Point(m.LParam.ToInt32());
                         var result = HTCLIENT;
+
+                        if (WindowState == System.Windows.Forms.FormWindowState.Maximized)
+                        {
+                            if (HeadingSize != 0 && point.Y >= Location.Y && point.Y <= Location.Y + HeadingSize)
+                                result = HTCAPTION;
+
+                            m.Result = (IntPtr)result;
+                            return;
+                        }
 
                         if (point.Y >= Location.Y && point.Y <= Location.Y + borderWidth)
                         {
