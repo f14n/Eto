@@ -444,7 +444,8 @@ namespace Eto.Forms
 		protected virtual void OnPreLoad(EventArgs e)
 		{
 			Properties.TriggerEvent(PreLoadKey, this, e);
-			Handler.OnPreLoad(e);
+			if (Handler != null)
+				Handler.OnPreLoad(e);
 		}
 
 		static readonly object LoadKey = new object();
@@ -473,8 +474,8 @@ namespace Eto.Forms
 		protected virtual void OnLoad(EventArgs e)
 		{
 #if DEBUG
-			if (Loaded)
-				throw new EtoException("Control was loaded more than once");
+			//if (Loaded)
+				//throw new EtoException("Control was loaded more than once");
 #endif
 			Properties.TriggerEvent(LoadKey, this, e);
 			Handler.OnLoad(e);
@@ -526,12 +527,13 @@ namespace Eto.Forms
 		protected virtual void OnUnLoad(EventArgs e)
 		{
 #if DEBUG
-			if (!Loaded)
-				throw new EtoException("Control was unloaded more than once");
+			//if (!Loaded)
+			//	throw new EtoException("Control was unloaded more than once");
 #endif
 			Loaded = false;
 			Properties.TriggerEvent(UnLoadKey, this, e);
-			Handler.OnUnLoad(e);
+			if (Handler != null)
+				Handler.OnUnLoad(e);
 		}
 
 		/// <summary>
