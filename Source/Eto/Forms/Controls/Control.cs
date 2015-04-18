@@ -1,7 +1,8 @@
 using System;
-using System.ComponentModel;
-using Eto.Drawing;
 using System.Collections.Generic;
+using System.ComponentModel;
+using System.Globalization;
+using Eto.Drawing;
 
 namespace Eto.Forms
 {
@@ -474,8 +475,8 @@ namespace Eto.Forms
 		protected virtual void OnLoad(EventArgs e)
 		{
 #if DEBUG
-			//if (Loaded)
-				//throw new EtoException("Control was loaded more than once");
+			if (Loaded)
+				throw new InvalidOperationException(string.Format(CultureInfo.CurrentCulture, "Control was loaded more than once"));
 #endif
 			Properties.TriggerEvent(LoadKey, this, e);
 			Handler.OnLoad(e);
@@ -527,8 +528,8 @@ namespace Eto.Forms
 		protected virtual void OnUnLoad(EventArgs e)
 		{
 #if DEBUG
-			//if (!Loaded)
-			//	throw new EtoException("Control was unloaded more than once");
+			if (!Loaded)
+				throw new InvalidOperationException(string.Format(CultureInfo.CurrentCulture, "Control was unloaded more than once"));
 #endif
 			Loaded = false;
 			Properties.TriggerEvent(UnLoadKey, this, e);
@@ -584,34 +585,6 @@ namespace Eto.Forms
 			EventLookup.Register<Control>(c => c.OnSizeChanged(null), Control.SizeChangedEvent);
 			EventLookup.Register<Control>(c => c.OnTextInput(null), Control.TextInputEvent);
 		}
-
-		#pragma warning disable 612,618
-
-		/// <summary>
-		/// Initializes a new instance of the <see cref="Eto.Forms.Control"/> class.
-		/// </summary>
-		/// <param name="generator">Generator to create the handler</param>
-		/// <param name="type">Type of the handler to create (must implement <see cref="IHandler"/>)</param>
-		/// <param name="initialize">Initialize the handler if true, false if the caller will initialize</param>
-		[Obsolete("Use default constructor and HandlerAttribute instead")]
-		protected Control(Generator generator, Type type, bool initialize = true)
-			: base(generator, type, initialize)
-		{
-		}
-
-		/// <summary>
-		/// Initializes a new instance of the Container with the specified handler
-		/// </summary>
-		/// <param name="generator">Generator for the widget</param>
-		/// <param name="handler">Pre-created handler to attach to this instance</param>
-		/// <param name="initialize">True to call handler's Initialze method, false otherwise</param>
-		[Obsolete("Use Control(IHandler) instead")]
-		protected Control(Generator generator, IHandler handler, bool initialize = true)
-			: base(generator, handler, initialize)
-		{
-		}
-
-		#pragma warning restore 612,618
 
 		/// <summary>
 		/// Initializes a new instance of the <see cref="Eto.Forms.Control"/> class.
@@ -835,7 +808,7 @@ namespace Eto.Forms
 		public void AttachNative()
 		{
 			if (Parent != null)
-				throw new EtoException("You can only attach a parentless control");
+				throw new InvalidOperationException(string.Format(CultureInfo.CurrentCulture, "You can only attach a parentless control"));
 
 			using (Platform.Context)
 			{

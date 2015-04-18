@@ -62,7 +62,7 @@ namespace Eto.Wpf.Forms
 			var handler = control.GetWpfFrameworkElement();
 			if (handler != null)
 				return handler.GetPreferredSize(available);
-			return Conversions.ZeroSize;
+			return WpfConversions.ZeroSize;
 		}
 	}
 
@@ -84,6 +84,15 @@ namespace Eto.Wpf.Forms
 		bool isMouseCaptured;
 		public bool XScale { get; private set; }
 		public bool YScale { get; private set; }
+
+		public override IntPtr NativeHandle
+		{
+			get
+			{
+				var hwnd = sw.PresentationSource.FromVisual(Control) as sw.Interop.HwndSource;
+				return hwnd != null ? hwnd.Handle : IntPtr.Zero;
+			}
+		}
 
 		protected sw.Size PreferredSize { get { return preferredSize; } set { preferredSize = value; } }
 

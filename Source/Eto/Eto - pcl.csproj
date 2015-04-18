@@ -57,9 +57,6 @@
     <Compile Include="EtoEnvironment.cs">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="EtoException.cs">
-      <SubType>Code</SubType>
-    </Compile>
     <Compile Include="Forms\Controls\DropDown.cs" />
     <Compile Include="Forms\Controls\EnumDropDown.cs" />
     <Compile Include="Forms\Controls\Grid.cs" />
@@ -80,11 +77,9 @@
     <Compile Include="Forms\Printing\PrintDocument.cs" />
     <Compile Include="Forms\Printing\PrintSettings.cs" />
     <Compile Include="Forms\ToolBar\RadioToolItem.cs" />
-    <Compile Include="Int32ArrayConverter.cs" />
     <Compile Include="NamespaceInfo.cs" />
     <Compile Include="OperatingSystemPlatform.cs" />
     <Compile Include="PropertyStore.cs" />
-    <Compile Include="ResourceNotFoundException.cs" />
     <Compile Include="Threading\Thread.cs" />
     <Compile Include="TypeHelper.cs" />
     <Compile Include="Widget.cs" />
@@ -229,7 +224,6 @@
     <Compile Include="Forms\Printing\PrintDialog.cs" />
     <Compile Include="Forms\Printing\PrintPageEventArgs.cs" />
     <Compile Include="EtoMemberIdentifier.cs" />
-    <Compile Include="HandlerInvalidException.cs" />
     <Compile Include="Forms\Range.cs" />
     <Compile Include="Forms\Controls\Navigation.cs" />
     <Compile Include="Forms\Controls\NavigationItem.cs" />
@@ -260,8 +254,6 @@
     <Compile Include="Binding\DelegateBinding.cs" />
     <Compile Include="Forms\IKeyboardInputSource.cs" />
     <Compile Include="Forms\IMouseInputSource.cs" />
-    <Compile Include="XmlExtensions.cs" />
-    <Compile Include="Drawing\XmlExtensions.cs" />
     <Compile Include="Drawing\SystemFonts.cs" />
     <Compile Include="Forms\Controls\Control.binding.cs" />
     <Compile Include="EventLookup.cs" />
@@ -287,8 +279,6 @@
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="PlatformContext.cs" />
-    <Compile Include="Generator.cs" />
-    <Compile Include="Generators.cs" />
     <Compile Include="HandlerAttribute.cs" />
     <Compile Include="AutoInitializeAttribute.cs" />
     <Compile Include="..\Shared\EnumerableExtensions.cs">
@@ -318,6 +308,7 @@
     <Compile Include="Forms\MaskedTextProvider\FixedMaskedTextProvider.cs" />
     <Compile Include="Forms\MaskedTextProvider\NumericMaskedTextProvider.cs" />
     <Compile Include="Forms\MaskedTextProvider\VariableMaskedTextProvider.cs" />
+    <Compile Include="Forms\Cells\ProgressCell.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="..\..\LICENSE">

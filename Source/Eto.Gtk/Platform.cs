@@ -56,7 +56,7 @@ namespace Eto.GtkSharp
 		public Platform()
 		{
 			if (EtoEnvironment.Platform.IsWindows && Environment.Is64BitProcess)
-				throw new NotSupportedException("Please compile/run GTK in x86 mode (32-bit) on windows");
+				throw new NotSupportedException(string.Format(System.Globalization.CultureInfo.CurrentCulture, "Please compile/run GTK in x86 mode (32-bit) on windows"));
 
 			AddTo(this);
 		}
@@ -85,6 +85,7 @@ namespace Eto.GtkSharp
 			p.Add<ImageViewCell.IHandler>(() => new ImageViewCellHandler());
 			p.Add<TextBoxCell.IHandler>(() => new TextBoxCellHandler());
 			p.Add<DrawableCell.IHandler>(() => new DrawableCellHandler());
+			p.Add<ProgressCell.IHandler>(() => new ProgressCellHandler());
 
 			// Forms.Controls
 			p.Add<Button.IHandler>(() => new ButtonHandler());

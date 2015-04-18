@@ -1,4 +1,5 @@
 using System;
+using System.Globalization;
 using Eto.Drawing;
 using Eto.Forms;
 using Eto.WinForms.Drawing;
@@ -11,7 +12,7 @@ using Eto.WinForms.Forms.Printing;
 
 namespace Eto.WinForms
 {
-	public static partial class Conversions
+	public static partial class WinConversions
 	{
 		public const float WheelDelta = 120f;
 
@@ -75,7 +76,7 @@ namespace Eto.WinForms
 				case ImageFormat.Png:
 					return sd.Imaging.ImageFormat.Png;
 				default:
-					throw new Exception("Invalid format specified");
+					throw new ArgumentException(string.Format(CultureInfo.CurrentCulture, "Invalid format specified"));
 			}
 		}
 
@@ -443,11 +444,6 @@ namespace Eto.WinForms
 		public static IMatrix ToEto(this sd2.Matrix matrix)
 		{
 			return new MatrixHandler(matrix);
-		}
-
-		public static float DegreesToRadians(float angle)
-		{
-			return (float)Math.PI * angle / 180.0f;
 		}
 
 		public static ITreeItem ToEto(this swf.TreeNode treeNode)

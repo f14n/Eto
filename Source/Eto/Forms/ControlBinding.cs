@@ -152,35 +152,38 @@ namespace Eto.Forms
 			return BindDataContext(new PropertyBinding<TValue>(memberInfo.Member.Name), mode);
 		}
 
-		#region Obsolete
-
 		/// <summary>
-		/// Obsolete. Use BindDataContext(...) instead.
+		/// Converts this binding's value to another value using delegates.
 		/// </summary>
-		[Obsolete("Use BindDataContext() instead")]
-		public DualBinding<TValue> Bind(IndirectBinding<TValue> dataContextBinding, DualBindingMode mode = DualBindingMode.TwoWay, TValue defaultControlValue = default(TValue), TValue defaultContextValue = default(TValue))
+		/// <remarks>This is useful when you want to cast one binding to another, perform logic when getting/setting a value from a particular
+		/// binding, or get/set a preoperty of the value.</remarks>
+		/// <typeparam name="TNewValue">Type of the value for the new binding</typeparam>
+		/// <param name="getValue">Delegate to translate the value when getting it for the new binding</param>
+		/// <param name="setValue">Delegate to translate the value when setting it to this binding</param>
+		public new ControlBinding<T, TNewValue> Convert<TNewValue>(Func<TValue, TNewValue> getValue, Action<TNewValue> setValue = null)
 		{
-			return BindDataContext(dataContextBinding, mode, defaultControlValue, defaultContextValue);
+			return new ControlBinding<T, TNewValue>(
+				DataItem,
+				c => getValue != null ? getValue(DataValue) : default(TNewValue),
+				(c,v) => { if (setValue != null) setValue(v); },
+				addChangeEvent: (c, ev) => DataValueChanged += ev,
+				removeChangeEvent: (c, ev) => DataValueChanged -= ev
+			);
 		}
 
 		/// <summary>
-		/// Obsolete. Use BindDataContext(...) instead.
+		/// Casts this binding value to another (compatible) type.
 		/// </summary>
-		[Obsolete("Use BindDataContext<T> instead")]
-		public DualBinding<TValue> Bind<TObject>(Func<TObject, TValue> getValue, Action<TObject, TValue> setValue = null, Action<TObject, EventHandler<EventArgs>> addChangeEvent = null, Action<TObject, EventHandler<EventArgs>> removeChangeEvent = null, DualBindingMode mode = DualBindingMode.TwoWay, TValue defaultGetValue = default(TValue), TValue defaultSetValue = default(TValue))
+		/// <typeparam name="TNewValue">The type to cast the values of this binding to.</typeparam>
+		public new ControlBinding<T, TNewValue> Cast<TNewValue>()
 		{
-			return BindDataContext(new DelegateBinding<TObject, TValue>(getValue, setValue, addChangeEvent, removeChangeEvent, defaultGetValue, defaultSetValue), mode);
+			return new ControlBinding<T, TNewValue>(
+				DataItem,
+				c => (TNewValue)(object)DataValue,
+				(c, v) => DataValue = (TValue)(object)v,
+				addChangeEvent: (c, ev) => DataValueChanged += ev,
+				removeChangeEvent: (c, ev) => DataValueChanged -= ev
+			);
 		}
-
-		/// <summary>
-		/// Obsolete. Use BindDataContext(...) instead.
-		/// </summary>
-		[Obsolete("Use BindDataContext<T> instead")]
-		public DualBinding<TValue> Bind<TObject>(DelegateBinding<TObject, TValue> binding, DualBindingMode mode = DualBindingMode.TwoWay)
-		{
-			return Bind(dataContextBinding: binding, mode: mode);
-		}
-
-		#endregion
 	}
 }

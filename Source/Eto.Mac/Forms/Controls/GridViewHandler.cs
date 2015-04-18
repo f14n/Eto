@@ -2,7 +2,6 @@ using System;
 using Eto.Forms;
 using System.Collections.Generic;
 using Eto.Drawing;
-using sd = System.Drawing;
 using System.Collections;
 using System.Linq;
 
@@ -69,7 +68,7 @@ namespace Eto.Mac.Forms.Controls
 
 			public override void MouseDown(NSEvent theEvent)
 			{
-				var point = ConvertPointFromBase(theEvent.LocationInWindow);
+				var point = ConvertPointFromView(theEvent.LocationInWindow, null);
 
 				int rowIndex;
 				if ((rowIndex = (int)GetRow(point)) >= 0)

@@ -1,6 +1,7 @@
+using System;
+using System.Globalization;
 using System.IO;
 using Eto.Drawing;
-using sd = System.Drawing;
 
 #if XAMMAC2
 using AppKit;
@@ -55,7 +56,7 @@ namespace Eto.Mac.Drawing
 		public void Create(string fileName)
 		{
 			if (!File.Exists(fileName))
-				throw new FileNotFoundException("Icon not found", fileName);
+				throw new FileNotFoundException(string.Format(CultureInfo.CurrentCulture, "Icon not found"), fileName);
 			Control = new NSImage(fileName);
 		}
 

@@ -61,28 +61,13 @@ namespace Eto.Forms
 	/// <seealso cref="Window.ToolBar"/>
 	/// <copyright>(c) 2014 by Curtis Wensley</copyright>
 	/// <license type="BSD-3">See LICENSE for full terms</license>
+	[ContentProperty("Items")]
 	[Handler(typeof(ToolBar.IHandler))]
 	public class ToolBar : Widget
 	{
 		internal new IHandler Handler { get { return (IHandler)base.Handler; } }
 
 		ToolItemCollection items;
-
-		/// <summary>
-		/// Initializes a new instance of the <see cref="Eto.Forms.ToolBar"/> class.
-		/// </summary>
-		public ToolBar()
-		{
-		}
-
-		/// <summary>
-		/// Initializes a new instance of the <see cref="Eto.Forms.ToolBar"/> class.
-		/// </summary>
-		/// <param name="generator">Generator.</param>
-		[Obsolete("Use default constructor instead")]
-		public ToolBar(Generator generator) : base(generator, typeof(IHandler))
-		{
-		}
 
 		/// <summary>
 		/// Gets or sets the docking hint for the toolbar.

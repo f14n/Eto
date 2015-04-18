@@ -43,6 +43,8 @@ namespace Eto.Wpf.Forms.Controls
 			{
 				HeadersVisibility = swc.DataGridHeadersVisibility.Column,
 				AutoGenerateColumns = false,
+				CanUserDeleteRows = false,
+				CanUserResizeRows = false,
 				CanUserAddRows = false,
 				RowHeaderWidth = 0,
 				SelectionMode = swc.DataGridSelectionMode.Single
@@ -91,11 +93,11 @@ namespace Eto.Wpf.Forms.Controls
 						var row = dep as swc.DataGridRow;
 
 						int rowIndex;
-						if ((rowIndex = row.GetIndex()) >= 0)
+						if (row != null && (rowIndex = row.GetIndex()) >= 0)
 						{
 							var columnIndex = cell.Column == null ? -1 : cell.Column.DisplayIndex;
 
-							var item = Control.SelectedItem;
+							var item = Control.Items[rowIndex];
 							var column = columnIndex == -1 || columnIndex >= Widget.Columns.Count ? null : Widget.Columns[columnIndex];
 							Callback.OnCellClick(Widget, new GridViewCellEventArgs(column, rowIndex, columnIndex, item));
 						}

@@ -1,7 +1,7 @@
 using System;
+using System.Globalization;
 using System.Linq;
 using Eto.Drawing;
-using SD = System.Drawing;
 using System.Collections.Generic;
 using System.Runtime.InteropServices;
 
@@ -449,7 +449,7 @@ namespace Eto.iOS.Drawing
 			var centerY = rect.GetMidY();
 			var centerX = rect.GetMidX();
 			Control.ConcatCTM(new CGAffineTransform(1.0f, 0, 0, yscale, 0, centerY - centerY * yscale));
-			Control.AddArc(centerX, centerY, rect.Width / 2, Conversions.DegreesToRadians(startAngle), Conversions.DegreesToRadians(startAngle + sweepAngle), sweepAngle < 0);
+			Control.AddArc(centerX, centerY, rect.Width / 2, MacConversions.DegreesToRadians(startAngle), MacConversions.DegreesToRadians(startAngle + sweepAngle), sweepAngle < 0);
 			Control.StrokePath();
 			EndDrawing();
 		}
@@ -465,7 +465,7 @@ namespace Eto.iOS.Drawing
 			var centerX = rect.GetMidX();
 			Control.ConcatCTM(new CGAffineTransform(1.0f, 0, 0, yscale, 0, centerY - centerY * yscale));
 			Control.MoveTo(centerX, centerY);
-			Control.AddArc(centerX, centerY, rect.Width / 2, Conversions.DegreesToRadians(startAngle), Conversions.DegreesToRadians(startAngle + sweepAngle), sweepAngle < 0);
+			Control.AddArc(centerX, centerY, rect.Width / 2, MacConversions.DegreesToRadians(startAngle), MacConversions.DegreesToRadians(startAngle + sweepAngle), sweepAngle < 0);
 			Control.AddLineToPoint(centerX, centerY);
 			Control.ClosePath();
 			Control.FillPath();
@@ -606,7 +606,7 @@ namespace Eto.iOS.Drawing
 
 		public void RotateTransform(float angle)
 		{
-			angle = (float)Conversions.DegreesToRadians(angle);
+			angle = (float)MacConversions.DegreesToRadians(angle);
 			Control.RotateCTM(angle);
 			currentTransform = CGAffineTransform.Multiply(CGAffineTransform.MakeRotation(angle), currentTransform);
 		}
@@ -638,7 +638,7 @@ namespace Eto.iOS.Drawing
 		public void RestoreTransform()
 		{
 			if (transformSaveCount <= 0)
-				throw new InvalidOperationException("No saved transform");
+				throw new InvalidOperationException(string.Format(CultureInfo.CurrentCulture, "No saved transform"));
 			RewindClip();
 			transformSaveCount--;
 			Control.RestoreState();

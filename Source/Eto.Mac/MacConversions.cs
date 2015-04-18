@@ -2,7 +2,6 @@ using System;
 using Eto.Drawing;
 using Eto.Forms;
 using Eto.Mac.Drawing;
-using sd = System.Drawing;
 using Eto.Mac.Forms.Printing;
 #if XAMMAC2
 using AppKit;
@@ -39,7 +38,7 @@ using nuint = System.UInt32;
 
 namespace Eto.Mac
 {
-	public static partial class Conversions
+	public static partial class MacConversions
 	{
 		public static NSColor ToNSUI(this Color color)
 		{
@@ -50,10 +49,16 @@ namespace Eto.Mac
 		{
 			if (color == null)
 				return Colors.Black;
-			//if (color.ColorSpace.ColorSpaceModel != NSColorSpaceModel.RGB)
-			color = color.UsingColorSpace(NSColorSpace.CalibratedRGB);
+			var converted = color.UsingColorSpace(NSColorSpace.CalibratedRGB);
+			if (converted == null)
+			{
+				// Convert named (e.g. system) colors to RGB using its CGColor
+				converted = color.CGColor.ToNS().UsingColorSpace(NSColorSpace.CalibratedRGB);
+				if (converted == null)
+					throw new ArgumentOutOfRangeException("color", "Color cannot be converted to an RGB colorspace");
+			}
 			nfloat red, green, blue, alpha;
-			color.GetRgba(out red, out green, out blue, out alpha);
+			converted.GetRgba(out red, out green, out blue, out alpha);
 			return new Color((float)red, (float)green, (float)blue, (float)alpha);
 		}
 
@@ -164,7 +169,7 @@ namespace Eto.Mac
 
 		public static MouseEventArgs GetMouseEvent(NSView view, NSEvent theEvent, bool includeWheel)
 		{
-			var pt = Conversions.GetLocation(view, theEvent);
+			var pt = MacConversions.GetLocation(view, theEvent);
 			Keys modifiers = KeyMap.GetModifiers(theEvent);
 			MouseButtons buttons = theEvent.GetMouseButtons();
 			SizeF? delta = null;
@@ -176,7 +181,7 @@ namespace Eto.Mac
 		public static MouseButtons GetMouseButtons(this NSEvent theEvent)
 		{
 			MouseButtons buttons = MouseButtons.None;
-			
+
 			switch (theEvent.Type)
 			{
 				case NSEventType.LeftMouseUp:
@@ -393,4 +398,3 @@ namespace Eto.Mac
 		}
 	}
 }
-

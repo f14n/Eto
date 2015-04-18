@@ -1,11 +1,12 @@
 using System;
+using System.Globalization;
 using Eto.Drawing;
 using Eto.Forms;
 using Eto.GtkSharp.Drawing;
 
 namespace Eto.GtkSharp
 {
-	public static class Conversions
+	public static class GtkConversions
 	{
 		public static Gdk.Color ToGdk(this Color color)
 		{
@@ -166,7 +167,7 @@ namespace Eto.GtkSharp
 				case ImageFormat.Png:
 					return "png";
 				default:
-					throw new Exception("Invalid format specified");
+					throw new ArgumentException(string.Format(CultureInfo.CurrentCulture, "Invalid format specified"));
 			}
 		}
 
@@ -315,11 +316,6 @@ namespace Eto.GtkSharp
 				default:
 					throw new NotSupportedException();
 			}
-		}
-
-		public static float DegreesToRadians(float angle)
-		{
-			return (float)Math.PI * angle / 180.0f;
 		}
 
 		public static void Apply(this Pen pen, GraphicsHandler graphics)

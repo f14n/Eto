@@ -1,7 +1,6 @@
 using System;
 using Eto.Drawing;
 using Eto.Forms;
-using SD = System.Drawing;
 using Eto.Mac.Forms.Controls;
 using System.Collections.Generic;
 using Eto.Mac.Forms.Printing;
@@ -48,13 +47,13 @@ namespace Eto.Mac.Forms
 		[Export("mouseMoved:")]
 		public void MouseMoved(NSEvent theEvent)
 		{
-			Handler.Callback.OnMouseMove(Handler.Widget, Conversions.GetMouseEvent(Handler.EventControl, theEvent, false));
+			Handler.Callback.OnMouseMove(Handler.Widget, MacConversions.GetMouseEvent(Handler.EventControl, theEvent, false));
 		}
 
 		[Export("mouseEntered:")]
 		public void MouseEntered(NSEvent theEvent)
 		{
-			Handler.Callback.OnMouseEnter(Handler.Widget, Conversions.GetMouseEvent(Handler.EventControl, theEvent, false));
+			Handler.Callback.OnMouseEnter(Handler.Widget, MacConversions.GetMouseEvent(Handler.EventControl, theEvent, false));
 		}
 
 		[Export("cursorUpdate:")]
@@ -65,13 +64,13 @@ namespace Eto.Mac.Forms
 		[Export("mouseExited:")]
 		public void MouseExited(NSEvent theEvent)
 		{
-			Handler.Callback.OnMouseLeave(Handler.Widget, Conversions.GetMouseEvent(Handler.EventControl, theEvent, false));
+			Handler.Callback.OnMouseLeave(Handler.Widget, MacConversions.GetMouseEvent(Handler.EventControl, theEvent, false));
 		}
 
 		[Export("scrollWheel:")]
 		public void ScrollWheel(NSEvent theEvent)
 		{
-			Handler.Callback.OnMouseWheel(Handler.Widget, Conversions.GetMouseEvent(Handler.EventControl, theEvent, true));
+			Handler.Callback.OnMouseWheel(Handler.Widget, MacConversions.GetMouseEvent(Handler.EventControl, theEvent, true));
 		}
 	}
 
@@ -99,13 +98,12 @@ namespace Eto.Mac.Forms
 		where TWidget: Control
 		where TCallback: Control.ICallback
 	{
-		bool focus;
 		bool mouseMove;
 		NSTrackingArea tracking;
 		NSTrackingAreaOptions mouseOptions;
 		MouseDelegate mouseDelegate;
-		Cursor cursor;
-		SizeF? naturalSize;
+
+		public override IntPtr NativeHandle { get { return Control.Handle; } }
 
 		Control.ICallback IMacViewHandler.Callback { get { return Callback; } }
 
@@ -117,13 +115,33 @@ namespace Eto.Mac.Forms
 
 		public virtual NSView FocusControl { get { return EventControl; } }
 
-		public virtual bool AutoSize { get; protected set; }
+		static readonly object AutoSizeKey = new object();
+		public virtual bool AutoSize
+		{
+			get { return Widget.Properties.Get<bool?>(AutoSizeKey) ?? true; }
+			protected set { Widget.Properties[AutoSizeKey] = value; }
+		}
 
-		public virtual Size MinimumSize { get; set; }
+		static readonly object MinimumSizeKey = new object();
+		public virtual Size MinimumSize
+		{
+			get { return Widget.Properties.Get<Size?>(MinimumSizeKey) ?? Size.Empty; }
+			set { Widget.Properties[MinimumSizeKey] = value; }
+		}
 
-		public virtual SizeF MaximumSize { get; set; }
+		static readonly object MaximumSizeKey = new object();
+		public virtual SizeF MaximumSize
+		{
+			get { return Widget.Properties.Get<SizeF?>(MaximumSizeKey) ?? SizeF.MaxValue; }
+			set { Widget.Properties[MaximumSizeKey] = value; }
+		}
 
-		public Size? PreferredSize { get; set; }
+		static readonly object PreferredSizeKey = new object();
+		public Size? PreferredSize
+		{
+			get { return Widget.Properties.Get<Size?>(PreferredSizeKey); }
+			set { Widget.Properties[PreferredSizeKey] = value; }
+		}
 
 		public virtual Size Size
 		{
@@ -146,17 +164,18 @@ namespace Eto.Mac.Forms
 			}
 		}
 
+		static readonly object NaturalSizeKey = new object();
 		protected SizeF? NaturalSize
 		{
-			get { return naturalSize; }
-			set { naturalSize = value; }
+			get { return Widget.Properties.Get<SizeF?>(NaturalSizeKey); }
+			set { Widget.Properties[NaturalSizeKey] = value; }
 		}
 
 		public virtual NSObject CustomFieldEditor { get { return null; } }
 
 		protected virtual bool LayoutIfNeeded(SizeF? oldPreferredSize = null, bool force = false)
 		{
-			naturalSize = null;
+			NaturalSize = null;
 			if (Widget.Loaded)
 			{
 				var oldSize = oldPreferredSize ?? ContainerControl.Frame.Size.ToEtoSize();
@@ -172,14 +191,9 @@ namespace Eto.Mac.Forms
 			return false;
 		}
 
-		protected MacView()
-		{
-			AutoSize = true;
-			MaximumSize = SizeF.MaxValue;
-		}
-
 		protected virtual SizeF GetNaturalSize(SizeF availableSize)
 		{
+			var naturalSize = NaturalSize;
 			if (naturalSize != null)
 				return naturalSize.Value;
 			var control = Control as NSControl;
@@ -190,6 +204,7 @@ namespace Eto.Mac.Forms
 				naturalSize = control.Frame.Size.ToEto();
 				if (size != null)
 					control.SetFrameSize(size.Value);
+				NaturalSize = naturalSize;
 				return naturalSize.Value;
 			}
 			return Size.Empty;
@@ -395,7 +410,7 @@ namespace Eto.Mac.Forms
 			if (handler != null)
 			{
 				var theEvent = Messaging.GetNSObject<NSEvent>(e);
-				var args = Conversions.GetMouseEvent(handler.ContainerControl, theEvent, false);
+				var args = MacConversions.GetMouseEvent(handler.ContainerControl, theEvent, false);
 				if (theEvent.ClickCount >= 2)
 					handler.Callback.OnMouseDoubleClick(handler.Widget, args);
 			
@@ -418,7 +433,7 @@ namespace Eto.Mac.Forms
 			if (handler != null)
 			{
 				var theEvent = Messaging.GetNSObject<NSEvent>(e);
-				var args = Conversions.GetMouseEvent(handler.ContainerControl, theEvent, false);
+				var args = MacConversions.GetMouseEvent(handler.ContainerControl, theEvent, false);
 				handler.Callback.OnMouseUp(handler.Widget, args);
 				if (!args.Handled)
 				{
@@ -434,7 +449,7 @@ namespace Eto.Mac.Forms
 			if (handler != null)
 			{
 				var theEvent = Messaging.GetNSObject<NSEvent>(e);
-				var args = Conversions.GetMouseEvent(handler.ContainerControl, theEvent, false);
+				var args = MacConversions.GetMouseEvent(handler.ContainerControl, theEvent, false);
 				handler.Callback.OnMouseMove(handler.Widget, args);
 				if (!args.Handled)
 				{
@@ -450,7 +465,7 @@ namespace Eto.Mac.Forms
 			if (handler != null)
 			{
 				var theEvent = Messaging.GetNSObject<NSEvent>(e);
-				var args = Conversions.GetMouseEvent(handler.ContainerControl, theEvent, true);
+				var args = MacConversions.GetMouseEvent(handler.ContainerControl, theEvent, true);
 				if (!args.Delta.IsZero)
 				{
 					handler.Callback.OnMouseWheel(handler.Widget, args);
@@ -474,7 +489,7 @@ namespace Eto.Mac.Forms
 
 		public virtual void Invalidate(Rectangle rect)
 		{
-			var region = rect.ToSDRectangleF().ToNS();
+			var region = rect.ToNS();
 			region.Y = EventControl.Frame.Height - region.Y - region.Height;
 			EventControl.SetNeedsDisplayInRect(region);
 		}
@@ -487,23 +502,32 @@ namespace Eto.Mac.Forms
 		{
 		}
 
+
+		static readonly object InitialFocusKey = new object();
+
+		bool InitialFocus
+		{
+			get { return Widget.Properties.Get<bool?>(InitialFocusKey) ?? false; }
+			set { Widget.Properties[InitialFocusKey] = value ? (object)true : null; }
+		}
+
 		public virtual void Focus()
 		{
 			if (FocusControl.Window != null)
 				FocusControl.Window.MakeFirstResponder(FocusControl);
 			else
-				focus = true;
+				InitialFocus = true;
 		}
 
-		Color? backgroundColor;
+		static readonly object BackgroundColorKey = new object();
 		public virtual Color BackgroundColor
 		{
-			get { return backgroundColor ?? Colors.Transparent; }
+			get { return Widget.Properties.Get<Color?>(BackgroundColorKey) ?? Colors.Transparent; }
 			set
 			{
-				backgroundColor = value;
+				Widget.Properties[BackgroundColorKey] = value;
 				if (Widget.Loaded)
-					SetBackgroundColor(backgroundColor);
+					SetBackgroundColor(value);
 			}
 		}
 
@@ -578,13 +602,15 @@ namespace Eto.Mac.Forms
 			get { return Cursor; }
 		}
 
+		static readonly object CursorKey = new object();
+
 		public virtual Cursor Cursor
 		{
-			get { return cursor; }
+			get { return Widget.Properties.Get<Cursor>(CursorKey); }
 			set {
-				if (cursor != value)
+				if (Cursor != value)
 				{
-					cursor = value;
+					Widget.Properties[CursorKey] = value;
 					AddMethod(selResetCursorRects, new Action<IntPtr, IntPtr>(TriggerResetCursorRects), "v@:");
 				}
 			}
@@ -593,7 +619,7 @@ namespace Eto.Mac.Forms
 		public string ToolTip
 		{
 			get { return ContentControl.ToolTip; }
-			set { ContentControl.ToolTip = value; }
+			set { ContentControl.ToolTip = value ?? string.Empty; }
 		}
 
 		public void Print(PrintSettings settings)
@@ -615,9 +641,12 @@ namespace Eto.Mac.Forms
 
 		public virtual void OnLoadComplete(EventArgs e)
 		{
-			if (focus && FocusControl.Window != null)
+			if (InitialFocus && FocusControl.Window != null)
+			{
 				FocusControl.Window.MakeFirstResponder(FocusControl);
-			SetBackgroundColor(backgroundColor);
+				InitialFocus = false;
+			}
+			SetBackgroundColor(Widget.Properties.Get<Color?>(BackgroundColorKey));
 		}
 
 		public virtual void OnUnLoad(EventArgs e)

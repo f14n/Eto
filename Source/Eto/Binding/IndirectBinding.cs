@@ -1,4 +1,5 @@
 using System;
+using System.Globalization;
 
 namespace Eto
 {
@@ -44,7 +45,7 @@ namespace Eto
 	/// The IndirectBinding is useful when you want to use the same binding on multiple
 	/// objects, such as when binding cells in a <see cref="Forms.Grid"/>.
 	/// 
-	/// Typically one would use <see cref="PropertyBinding"/> or <see cref="ColumnBinding{T}"/>
+	/// Typically one would use <see cref="PropertyBinding{T}"/> or <see cref="ColumnBinding{T}"/>
 	/// which are ways to retrieve either a property value or column/index-based value.
 	/// </remarks>
 	/// <copyright>(c) 2014 by Curtis Wensley</copyright>
@@ -250,6 +251,30 @@ namespace Eto
 				{
 					if (val == true)
 						SetValue(m, trueValue);
+				},
+				addChangeEvent: (m, ev) => AddValueChangedHandler(m, ev),
+				removeChangeEvent: RemoveValueChangedHandler
+			);
+		}
+
+		/// <summary>
+		/// Converts the a binding to an enumeration to/from its string representation
+		/// </summary>
+		/// <returns>Binding to the string value of the enumeration.</returns>
+		/// <param name="defaultValue">Default if the value is not valid or empty.</param>
+		public IndirectBinding<string> EnumToString(T defaultValue = default(T))
+		{
+			var enumType = Nullable.GetUnderlyingType(typeof(T)) ?? typeof(T);
+			if (!enumType.IsEnum())
+				throw new ArgumentException(string.Format(CultureInfo.CurrentCulture, "Type of T ({0}) must be an enumeration type", typeof(T)));
+			return new DelegateBinding<object, string>(
+				m => System.Convert.ToString(GetValue(m)),
+				(m, val) =>
+				{
+					var value = Enum.IsDefined(enumType, val)
+						? (T)Enum.Parse(enumType, val)
+						: defaultValue;
+					SetValue(m, value);
 				},
 				addChangeEvent: (m, ev) => AddValueChangedHandler(m, ev),
 				removeChangeEvent: RemoveValueChangedHandler

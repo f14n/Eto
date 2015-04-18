@@ -1,6 +1,5 @@
 using System;
 using Eto.Forms;
-using SD = System.Drawing;
 using Eto.Drawing;
 using Eto.Mac.Drawing;
 #if XAMMAC2
@@ -48,13 +47,19 @@ namespace Eto.Mac.Forms.Controls
 
 		public override NSView FocusControl { get { return text; } }
 
+		public NSTextField TextField { get { return text; } }
+
+		public NSStepper Stepper { get { return stepper; } }
+
 		public class EtoTextField : NSTextField, IMacControl
 		{
 			public WeakReference WeakHandler { get; set; }
 		}
 
-		class EtoNumericUpDownView : MacEventView
+		class EtoNumericUpDownView : NSView, IMacControl
 		{
+			public WeakReference WeakHandler { get; set; }
+
 			public override void SetFrameSize(CGSize newSize)
 			{
 				base.SetFrameSize(newSize);
@@ -82,13 +87,13 @@ namespace Eto.Mac.Forms.Controls
 			get { return text; }
 		}
 
-		static NSNumberFormatter DefaultFormatter = new NSNumberFormatter { NumberStyle = NSNumberFormatterStyle.Decimal, Lenient = true };
+		public static NSNumberFormatter DefaultFormatter = new NSNumberFormatter { NumberStyle = NSNumberFormatterStyle.Decimal, Lenient = true };
 
 		public NumericUpDownHandler()
 		{
 			this.Control = new EtoNumericUpDownView
 			{
-				Handler = this,
+				WeakHandler = new WeakReference(this),
 				AutoresizesSubviews = false
 			};
 			text = new EtoTextField

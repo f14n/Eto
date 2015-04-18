@@ -118,6 +118,29 @@ namespace Eto.Forms
 		}
 
 		/// <summary>
+		/// Identifier for handlers when attaching the <see cref="OwnerChanged"/> event.
+		/// </summary>
+		private const string OwnerChangedEvent = "Window.OwnerChanged";
+
+		/// <summary>
+		/// Occurs when the <see cref="Owner"/> is changed.
+		/// </summary>
+		public event EventHandler<EventArgs> OwnerChanged
+		{
+			add { Properties.AddEvent(OwnerChangedEvent, value); }
+			remove { Properties.RemoveEvent(OwnerChangedEvent, value); }
+		}
+
+		/// <summary>
+		/// Raises the <see cref="OwnerChanged"/> event.
+		/// </summary>
+		/// <param name="e">Event arguments</param>
+		protected virtual void OnOwnerChanged(EventArgs e)
+		{
+			Properties.TriggerEvent(OwnerChangedEvent, this, e);
+		}
+
+		/// <summary>
 		/// Identifier for handlers when attaching the <see cref="WindowStateChanged"/> event.
 		/// </summary>
 		public const string WindowStateChangedEvent = "Window.WindowStateChanged";
@@ -139,6 +162,12 @@ namespace Eto.Forms
 		{
 			Properties.TriggerEvent(WindowStateChangedEvent, this, e);
 		}
+
+		#endregion
+
+		#region Properties
+
+		Window owner = null;
 
 		#endregion
 
@@ -164,21 +193,6 @@ namespace Eto.Forms
 		protected Window(IHandler handler)
 			: base(handler)
 		{
-		}
-
-		/// <summary>
-		/// Initializes a new instance of the <see cref="Eto.Forms.Window"/> class.
-		/// </summary>
-		/// <param name="generator">Generator to create the handler instance</param>
-		/// <param name="type">Type of interface to create for the handler, must implement <see cref="IHandler"/></param>
-		/// <param name="initialize"><c>true</c> to initialize the handler, false if the subclass will initialize</param>
-		[Obsolete("Use default constructor and HandlerAttribute instead")]
-		protected Window(Generator generator, Type type, bool initialize = true)
-			: base(generator, type, false)
-		{
-			if (initialize)
-				Initialize();
-			HandleEvent(ClosedEvent);
 		}
 
 		/// <summary>
@@ -261,6 +275,23 @@ namespace Eto.Forms
 		public virtual void Close()
 		{
 			Handler.Close();
+		}
+
+		/// <summary>
+		/// Gets or sets the owner of this window.
+		/// </summary>
+		/// <value>The owner of this window.</value>
+		public Window Owner
+		{
+			get { return this.owner; }
+			set
+			{
+				if (this.owner != value)
+				{
+					this.owner = value;
+					this.OnOwnerChanged(EventArgs.Empty);
+				}
+			}
 		}
 
 		/// <summary>
@@ -386,19 +417,19 @@ namespace Eto.Forms
 		}
 
 		/// <summary>
-		/// Gets the bounds of the window before it was minimized or maximized.
+		/// Gets the bounds of the window before it was minimized or maximized, or the current bounds if <see cref="WindowState"/> is Normal.
 		/// </summary>
 		/// <remarks>
 		/// This is useful to retrieve the desired size and position of the window even though it is currently maximized or minimized.
 		/// </remarks>
 		/// <value>The restore bounds.</value>
-		public Rectangle? RestoreBounds
+		public Rectangle RestoreBounds
 		{
 			get { return Handler.RestoreBounds; }
 		}
 
 		/// <summary>
-        /// Sets <see cref="WindowState"/> to <see cref="Eto.Forms.WindowState.Minimized"/>
+		/// Sets <see cref="WindowState"/> to <see cref="Eto.Forms.WindowState.Minimized"/>
 		/// </summary>
 		public void Minimize()
 		{
@@ -640,7 +671,7 @@ namespace Eto.Forms
 			/// This is useful to retrieve the desired size and position of the window even though it is currently maximized or minimized.
 			/// </remarks>
 			/// <value>The restore bounds.</value>
-			Rectangle? RestoreBounds { get; }
+			Rectangle RestoreBounds { get; }
 
 			/// <summary>
 			/// Gets or sets the style of this window.

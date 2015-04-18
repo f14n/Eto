@@ -7,9 +7,7 @@
     <ProjectTypeGuids>{A3F8F2AB-B479-4A4A-A458-A89E7DC349F1};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
     <OutputType>Library</OutputType>
     <RootNamespace>Eto.Mac</RootNamespace>
-    <TargetFrameworkVersion>v2.0</TargetFrameworkVersion>
     <AssemblyName>Eto.XamMac2</AssemblyName>
-    <TargetFrameworkIdentifier>Xamarin.Mac</TargetFrameworkIdentifier>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugType>full</DebugType>
@@ -50,6 +48,7 @@
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="Xamarin.Mac" />
+    <Reference Include="System.Drawing" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Drawing\BrushHandler.cs" />
@@ -162,10 +161,10 @@
     <Compile Include="Forms\Printing\PrintSettingsHandler.cs" />
     <Compile Include="Forms\MacControlExtensions.cs" />
     <Compile Include="Forms\MacBase.cs" />
-    <Compile Include="Conversions.sd.cs" />
-    <Compile Include="Conversions.cg.cs" />
-    <Compile Include="Conversions.cs" />
-    <Compile Include="Conversions.ns.cs" />
+    <Compile Include="SDConversions.cs" />
+    <Compile Include="CGConversions.cs" />
+    <Compile Include="MacConversions.cs" />
+    <Compile Include="MacConversions.ns.cs" />
     <Compile Include="Forms\FontDialogHandler.cs" />
     <Compile Include="Drawing\FontsHandler.cs" />
     <Compile Include="Drawing\FontFamilyHandler.cs" />
@@ -213,6 +212,7 @@
     <Compile Include="..\Shared\FixedMaskedTextProviderHandler.cs">
       <Link>Forms\FixedMaskedTextProviderHandler.cs</Link>
     </Compile>
+    <Compile Include="Forms\Cells\ProgressCellHandler.cs" />
   </ItemGroup>
   <ItemGroup />
   <ProjectExtensions>

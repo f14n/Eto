@@ -62,6 +62,8 @@ namespace Eto.GtkSharp.Forms
 		Color? backgroundColor;
 		public static float ScrollAmount = 2f;
 
+		public override IntPtr NativeHandle { get { return Control.Handle; } }
+
 		protected GtkControl()
 		{
 			size = new Size(-1, -1);
@@ -84,38 +86,6 @@ namespace Eto.GtkSharp.Forms
 		public virtual Gtk.Widget ContainerContentControl
 		{
 			get { return ContainerControl; }
-		}
-
-		public static string StringToMnuemonic(string label)
-		{
-			if (label == null)
-				return string.Empty;
-			label = label.Replace("_", "__");
-			var match = Regex.Match(label, @"(?<=([^&](?:[&]{2})*)|^)[&](?![&])");
-			if (match.Success)
-			{
-				var sb = new StringBuilder(label);
-				sb[match.Index] = '_';
-				sb.Replace("&&", "&");
-				return sb.ToString();
-			}
-			return label.Replace("&&", "&");
-		}
-
-		public static string MnuemonicToString(string label)
-		{
-			if (label == null)
-				return null;
-			var match = Regex.Match(label, @"(?<=([^_](?:[_]{2})*)|^)[_](?![_])");
-			if (match.Success)
-			{
-				var sb = new StringBuilder(label);
-				sb[match.Index] = '&';
-				sb.Replace("__", "_");
-				return sb.ToString();
-			}
-			label = label.Replace("__", "_");
-			return label;
 		}
 
 		public virtual Point CurrentLocation { get; set; }

@@ -1,6 +1,7 @@
 using System;
-using Eto.Drawing;
 using System.Collections.Generic;
+using System.Globalization;
+using Eto.Drawing;
 using sd = System.Drawing;
 
 #if OSX
@@ -140,7 +141,7 @@ namespace Eto.iOS.Drawing
 				MoveTo ((float)xs, (float)ys);
 			}
 
-			Control.AddArc (affine, x+ width / 2, centerY, width / 2, Conversions.DegreesToRadians (startAngle), Conversions.DegreesToRadians (startAngle + sweepAngle), sweepAngle < 0);
+			Control.AddArc (affine, x+ width / 2, centerY, width / 2, MacConversions.DegreesToRadians (startAngle), MacConversions.DegreesToRadians (startAngle + sweepAngle), sweepAngle < 0);
 		}
 
 		public void AddBezier (PointF start, PointF control1, PointF control2, PointF end)
@@ -158,7 +159,7 @@ namespace Eto.iOS.Drawing
 		private void Check(float f)
 		{
 			if (float.IsInfinity(f) || float.IsNaN(f))
-				throw new InvalidOperationException("Invalid point specified to AddCurveToPoint");
+				throw new InvalidOperationException(string.Format(CultureInfo.CurrentCulture, "Invalid point specified to AddCurveToPoint"));
 		}
 
 		private void Check(PointF p)

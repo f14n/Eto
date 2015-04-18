@@ -71,9 +71,7 @@ namespace Eto
 	/// </remarks>
 	/// <copyright>(c) 2012-2015 by Curtis Wensley</copyright>
 	/// <license type="BSD-3">See LICENSE for full terms</license>
-#pragma warning disable 0612,0618
-	public abstract class Platform : Generator
-#pragma warning restore 0612,0618
+	public abstract class Platform
 	{
 		readonly Dictionary<Type, Func<object>> instantiatorMap = new Dictionary<Type, Func<object>>();
 		readonly Dictionary<Type, HandlerInfo> handlerMap = new Dictionary<Type, HandlerInfo>();
@@ -143,6 +141,46 @@ namespace Eto
 		}
 
 		#endregion
+
+		/// <summary>
+		/// Gets the ID of this platform
+		/// </summary>
+		/// <remarks>
+		/// The platform ID can be used to determine which platform is currently in use.  The platform
+		/// does not necessarily correspond to the OS that it is running on, as for example the GTK platform
+		/// can run on OS X and Windows.
+		/// </remarks>
+		public abstract string ID { get; }
+
+		/// <summary>
+		/// Gets a value indicating whether this platform is a mac based platform (MonoMac/XamMac)
+		/// </summary>
+		/// <value><c>true</c> if this platform is mac; otherwise, <c>false</c>.</value>
+		public virtual bool IsMac { get { return false; } }
+
+		/// <summary>
+		/// Gets a value indicating whether this platform is based on Windows Forms
+		/// </summary>
+		/// <value><c>true</c> if this platform is window forms; otherwise, <c>false</c>.</value>
+		public virtual bool IsWinForms { get { return false; } }
+
+		/// <summary>
+		/// Gets a value indicating whether this platform is based on WPF
+		/// </summary>
+		/// <value><c>true</c> if this platform is wpf; otherwise, <c>false</c>.</value>
+		public virtual bool IsWpf { get { return false; } }
+
+		/// <summary>
+		/// Gets a value indicating whether this platform is based on GTK# (2 or 3)
+		/// </summary>
+		/// <value><c>true</c> if this platform is gtk; otherwise, <c>false</c>.</value>
+		public virtual bool IsGtk { get { return false; } }
+
+		/// <summary>
+		/// Gets a value indicating whether this platform is based on Xamarin.iOS
+		/// </summary>
+		/// <value><c>true</c> if this platform is ios; otherwise, <c>false</c>.</value>
+		public virtual bool IsIos { get { return false; } }
 
 		/// <summary>
 		/// Gets a value indicating whether this platform is based on Xamarin.Android.
@@ -224,8 +262,6 @@ namespace Eto
 		{
 			get
 			{
-				//if (current == null)
-				//	throw new EtoException("Generator has not been initialized");
 				return instance.Value;
 			}
 		}
@@ -240,7 +276,7 @@ namespace Eto
 		/// Mac OS X will prefer the Mac platform.
 		/// Other unix-based platforms will prefer GTK.
 		/// </remarks>
-		public new static Platform Detect
+		public static Platform Detect
 		{
 			get
 			{
@@ -273,7 +309,7 @@ namespace Eto
 				}
 				
 				if (detected == null)
-					throw new EtoException("Could not detect platform. Are you missing a platform assembly?");
+					throw new InvalidOperationException(string.Format(CultureInfo.CurrentCulture, "Could not detect platform. Are you missing a platform assembly?"));
 					
 				Initialize(detected);
 				return globalInstance;
@@ -298,7 +334,7 @@ namespace Eto
 		/// Initialize the generator with the specified <paramref name="platformType"/> as the current generator
 		/// </summary>
 		/// <param name="platformType">Type of the generator to set as the current generator</param>
-		public static new void Initialize(string platformType)
+		public static void Initialize(string platformType)
 		{
 			Initialize(Get(platformType));
 		}
@@ -320,7 +356,7 @@ namespace Eto
 			{
 				if (allowNull)
 					return null;
-				throw new EtoException("Platform not found. Are you missing the platform assembly?");
+				throw new InvalidOperationException(string.Format(CultureInfo.CurrentCulture, "Platform not found. Are you missing the platform assembly?"));
 			}
 			try
 			{
@@ -331,7 +367,7 @@ namespace Eto
 					if (allowNull)
 						Debug.WriteLine(message);
 					else
-						throw new EtoException(message);
+						throw new InvalidOperationException(string.Format(CultureInfo.CurrentCulture, message));
 					return null;
 				}
 				return platform;
@@ -388,6 +424,17 @@ namespace Eto
 			return null;
 		}
 
+		/// <summary>
+		/// Finds the delegate to create instances of the specified type
+		/// </summary>
+		/// <typeparam name="T">Type of the handler interface (usually derived from <see cref="Widget.IHandler"/> or another type)</typeparam>
+		/// <returns>The delegate to use to create instances of the specified type</returns>
+		public Func<T> Find<T>()
+			where T: class
+		{
+			return (Func<T>)Find(typeof(T));
+		}
+
 		internal HandlerInfo FindHandler(Type type)
 		{
 			HandlerInfo info;
@@ -431,7 +478,7 @@ namespace Eto
 			{
 				var instantiator = Find(type);
 				if (instantiator == null)
-					throw new HandlerInvalidException(string.Format(CultureInfo.CurrentCulture, "type {0} could not be found in this generator", type.FullName));
+					throw new ArgumentException(string.Format(CultureInfo.CurrentCulture, "Type {0} could not be found in this generator", type.FullName));
 
 				var handler = instantiator();
 				OnHandlerCreated(new HandlerCreatedEventArgs(handler));
@@ -439,7 +486,7 @@ namespace Eto
 			}
 			catch (Exception e)
 			{
-				throw new HandlerInvalidException(string.Format(CultureInfo.CurrentCulture, "Could not create instance of type {0}", type), e);
+				throw new InvalidOperationException(string.Format(CultureInfo.CurrentCulture, "Could not create instance of type {0}", type), e);
 			}
 		}
 

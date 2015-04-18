@@ -1,5 +1,4 @@
 using System;
-using SD = System.Drawing;
 using Eto.Forms;
 using System.Threading.Tasks;
 
@@ -39,7 +38,7 @@ namespace Eto.Mac.Forms
 	public class DialogHandler : MacWindow<MyWindow, Dialog, Dialog.ICallback>, Dialog.IHandler
 	{
 		Button button;
-		MacModal.ModalHelper session;
+		ModalEventArgs session;
 
 		protected override bool DisposeControl { get { return false; } }
 
@@ -101,7 +100,7 @@ namespace Eto.Mac.Forms
 			ConfigureWindow();
 		}
 
-		public void ShowModal(Control parent)
+		public virtual void ShowModal(Control parent)
 		{
 			session = null;
 			if (parent != null && parent.ParentWindow != null)
@@ -114,15 +113,15 @@ namespace Eto.Mac.Forms
 
 			Widget.Closed += HandleClosed;
 			if (DisplayMode.HasFlag(DialogDisplayMode.Attached))
-				MacModal.RunSheet(Control, out session);
+				MacModal.RunSheet(Widget, Control, out session);
 			else
 			{
 				Control.MakeKeyWindow();
-				MacModal.Run(Control, out session);
+				MacModal.Run(Widget, Control, out session);
 			}
 		}
 
-		public Task ShowModalAsync(Control parent)
+		public virtual Task ShowModalAsync(Control parent)
 		{
 			var tcs = new TaskCompletionSource<bool>();
 			session = null;
@@ -137,14 +136,14 @@ namespace Eto.Mac.Forms
 			Widget.Closed += HandleClosed;
 			if (DisplayMode.HasFlag(DialogDisplayMode.Attached))
 			{
-				MacModal.BeginSheet(Control, out session, () => tcs.SetResult(true));
+				MacModal.BeginSheet(Widget, Control, out session, () => tcs.SetResult(true));
 			}
 			else
 			{
 				Control.MakeKeyWindow();
 				Application.Instance.AsyncInvoke(() =>
 				{
-					MacModal.Run(Control, out session);
+					MacModal.Run(Widget, Control, out session);
 					tcs.SetResult(true);
 				});
 

@@ -1,5 +1,6 @@
 using System;
 using Eto.Drawing;
+using System.ComponentModel;
 
 namespace Eto.Forms
 {
@@ -53,34 +54,6 @@ namespace Eto.Forms
 		new IHandler Handler { get { return (IHandler)base.Handler; } }
 
 		/// <summary>
-		/// Initializes a new instance of the <see cref="Eto.Forms.Label"/> class.
-		/// </summary>
-		public Label()
-		{
-		}
-
-		/// <summary>
-		/// Initializes a new instance of the <see cref="Eto.Forms.Label"/> class.
-		/// </summary>
-		/// <param name="generator">Generator.</param>
-		[Obsolete("Use default constructor instead")]
-		public Label(Generator generator) : this(generator, typeof(IHandler))
-		{
-		}
-
-		/// <summary>
-		/// Initializes a new instance of the <see cref="Eto.Forms.Label"/> class.
-		/// </summary>
-		/// <param name="generator">Generator.</param>
-		/// <param name="type">Type.</param>
-		/// <param name="initialize">If set to <c>true</c> initialize.</param>
-		[Obsolete("Use default constructor and HandlerAttribute instead")]
-		protected Label(Generator generator, Type type, bool initialize = true)
-			: base(generator, type, initialize)
-		{
-		}
-
-		/// <summary>
 		/// Gets or sets the wrap mode for the text
 		/// </summary>
 		/// <remarks>
@@ -92,6 +65,7 @@ namespace Eto.Forms
 		/// to the container or explicitly set the size.
 		/// </remarks>
 		/// <value>The wrapping mode for the text.</value>
+		[DefaultValue(WrapMode.Word)]
 		public WrapMode Wrap
 		{
 			get { return Handler.Wrap; }
@@ -250,6 +224,22 @@ namespace Eto.Forms
 			return value1 != value2.value;
 		}
 
+		/// <summary>Convert from string to vertical align (for json/xaml compat)</summary>
+		/// <param name="value">Value.</param>
+		public static implicit operator HorizontalAlign(string value)
+		{
+			switch (value.ToLowerInvariant())
+			{
+				case "Center":
+					return HorizontalAlign.Center;
+				case "Bottom":
+					return HorizontalAlign.Right;
+				default:
+				case "Top":
+					return HorizontalAlign.Left;
+			}
+		}
+
 		/// <summary>
 		/// Determines whether the specified <see cref="System.Object"/> is equal to the current <see cref="Eto.Forms.HorizontalAlign"/>.
 		/// </summary>
@@ -326,6 +316,22 @@ namespace Eto.Forms
 		public static bool operator !=(VerticalAlignment value1, VerticalAlign value2)
 		{
 			return value1 != value2.value;
+		}
+
+		/// <summary>Convert from string to vertical align (for json/xaml compat)</summary>
+		/// <param name="value">Value.</param>
+		public static implicit operator VerticalAlign(string value)
+		{
+			switch (value.ToLowerInvariant())
+			{
+				case "Middle":
+					return VerticalAlign.Middle;
+				case "Bottom":
+					return VerticalAlign.Bottom;
+				default:
+				case "Top":
+					return VerticalAlign.Top;
+			}
 		}
 
 		/// <summary>

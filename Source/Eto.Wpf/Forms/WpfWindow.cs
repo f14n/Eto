@@ -36,6 +36,11 @@ namespace Eto.Wpf.Forms
 		bool maximizable = true;
 		bool minimizable = true;
 
+		public override IntPtr NativeHandle
+		{
+			get { return new System.Windows.Interop.WindowInteropHelper(Control).EnsureHandle(); }
+		}
+
 		protected override void Initialize()
 		{
 			content = new swc.DockPanel();
@@ -95,8 +100,8 @@ namespace Eto.Wpf.Forms
 							// last window closing, so call OnTerminating to let the app abort terminating
 							var app = ((ApplicationHandler)Application.Instance.Handler);
 							app.Callback.OnTerminating(app.Widget, args);
-							e.Cancel = args.Cancel;
 						}
+						e.Cancel = args.Cancel;
 					};
 					break;
 				case Window.WindowStateChangedEvent:
@@ -115,6 +120,12 @@ namespace Eto.Wpf.Forms
 					base.AttachEvent(id);
 					break;
 			}
+		}
+
+		public override void OnLoad(EventArgs e)
+		{
+			base.OnLoad(e);
+			SetScale(false, false);
 		}
 
 		protected virtual void UpdateClientSize(Size size)
@@ -350,7 +361,7 @@ namespace Eto.Wpf.Forms
 			{
 				Control.Left = value.X;
 				Control.Top = value.Y;
-				if (!Widget.Loaded)
+				if (!Control.IsLoaded)
 					LocationSet = true;
 			}
 		}
@@ -396,9 +407,9 @@ namespace Eto.Wpf.Forms
 			}
 		}
 
-		public Rectangle? RestoreBounds
+		public Rectangle RestoreBounds
 		{
-			get { return Control.RestoreBounds.ToEto(); }
+			get { return Control.WindowState == sw.WindowState.Normal || Control.RestoreBounds.IsEmpty ? Widget.Bounds : Control.RestoreBounds.ToEto(); }
 		}
 
 		sw.Window IWpfWindow.Control
