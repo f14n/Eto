@@ -71,6 +71,22 @@ namespace Eto.Mac.Forms
 				base.Center();
 		}
 
+		public override bool CanBecomeKeyWindow
+		{
+			get
+			{
+				return true;
+			}
+		}
+
+		public override bool CanBecomeMainWindow
+		{
+			get
+			{
+				return true;
+			}
+		}
+
         public override void Zoom(NSObject sender)
 		{
 			if (zoom)
