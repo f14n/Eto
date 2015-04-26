@@ -143,6 +143,21 @@ namespace Eto.WinForms.Forms
                         createParamsHack = false;
                         return;
                     case WM_NCCALCSIZE:
+                        if (m.WParam.Equals(IntPtr.Zero))
+                        {
+                            Win32.RECT rc = (Win32.RECT)m.GetLParam(typeof(Win32.RECT));
+                            Rectangle r = rc.ToRectangle();
+                            r.Height--;
+                            Marshal.StructureToPtr(new Win32.RECT(r), m.LParam, true);
+                        }
+                        else
+                        {
+                            Win32.NCCALCSIZE_PARAMS csp = (Win32.NCCALCSIZE_PARAMS)m.GetLParam(typeof(Win32.NCCALCSIZE_PARAMS));
+                            Rectangle r = csp.rgrc0.ToRectangle();
+                            r.Height--;
+                            csp.rgrc0 = new Win32.RECT(r);
+                            Marshal.StructureToPtr(csp, m.LParam, true);
+                        }
                         m.Result = IntPtr.Zero;
                         return;
                     case WM_NCHITTEST:
@@ -299,5 +314,5 @@ namespace Eto.WinForms.Forms
 			get { return Control.KeyPreview; }
 			set { Control.KeyPreview = value; }
 		}
-	}
+    }
 }

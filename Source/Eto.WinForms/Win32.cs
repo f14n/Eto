@@ -119,7 +119,40 @@ namespace Eto
 			EM_SETCUEBANNER = ECM_FIRST + 1
 		}
 
-		public static ushort LOWORD(IntPtr word)
+        [StructLayout(LayoutKind.Sequential)]
+        public struct RECT
+        {
+            public int left, top, right, bottom;
+
+            public RECT(Eto.Drawing.Rectangle rc)
+            {
+                left = rc.Left;
+                top = rc.Top;
+                right = rc.Right;
+                bottom = rc.Bottom;
+            }
+
+            public Eto.Drawing.Rectangle ToRectangle()
+            {
+                return new Eto.Drawing.Rectangle(left, top, right - left, bottom - top);
+            }
+        }
+
+        [StructLayout(LayoutKind.Sequential)]
+        public struct NCCALCSIZE_PARAMS
+        {
+            public RECT rgrc0, rgrc1, rgrc2;
+            public WINDOWPOS lppos;
+        }
+
+        [StructLayout(LayoutKind.Sequential)]
+        public struct WINDOWPOS
+        {
+            public IntPtr hWnd, hWndInsertAfter;
+            public int x, y, cx, cy, flags;
+        }
+
+        public static ushort LOWORD(IntPtr word)
 		{
 			return (ushort)(((long)word) & 0xffff);
 		}
